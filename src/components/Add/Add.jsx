@@ -161,7 +161,7 @@ const Add = () => {
             type="text"
             name="marital"
             id="marital"
-            placeholder="Marital Status (Yes / No)"
+            placeholder="Marital Status (Single / Married)"
             value={marital || ''}
             onChange={handleInputChange}
           />
@@ -352,10 +352,12 @@ const AddWrapper = styled.section`
       margin: 5px 0;
       width: 100%;
       font-size: 16px;
+      text-transform: capitalize;
 
       ::placeholder {
         font-size: 15px;
         font-weight: 600;
+        text-transform: uppercase;
       }
     }
 
