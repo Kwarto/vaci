@@ -24,6 +24,7 @@ const Login = () => {
       e.preventDefault();
       if (email && password) {
          const { user } = await signInWithEmailAndPassword(auth, email, password);
+         console.log(user);
       } else {
          toast.error("Invalid email or password");
       }

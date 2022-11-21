@@ -163,7 +163,7 @@ const Add = () => {
       },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setData((prev) => ({...prev, imgUrl: downloadURL}))
+          setData((prev) => ({...prev,  downloadURL}))
         })
       })
     }
