@@ -3,9 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import fireDb from '../../firebase';
-import { storage } from '../../firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-
 const initialState = {
   name: '',
   gender: '',
@@ -33,8 +30,6 @@ const initialState = {
 const Add = () => {
   const [state, setState] = useState(initialState);
   const [data, setData] = useState({});
-  const [file, setFile] = useState(false);
-  const [progress, setProgress] = useState(false);
   const navigate = useNavigate();
   const {
     name,
@@ -141,34 +136,6 @@ const Add = () => {
     setState({ ...state, [name]: value });
   };
 
-  useEffect(() => {
-    const uploadFile = () => {
-      const storageRef = ref(storage, file.name);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on('images', (snapshot) => {
-        const progress = (snapshot.byTransferred / snapshot.totalBytes) * 100;
-        setProgress(progress);
-        switch (snapshot.state) {
-          case "Pause":
-            console.log("UPload is pause");
-            break;
-          case "Running":
-            console.log("Upload is running");
-            break;
-          default:
-            break;
-        }
-      }, (error) => {
-        console.log(error);
-      },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setData((prev) => ({...prev}))
-        })
-      })
-    }
-    file && uploadFile(); 
-  }, [file])
   return (
     <AddWrapper>
       <form onSubmit={handleSubmit}>
@@ -342,18 +309,11 @@ const Add = () => {
             value={lifeMother || ''}
             onChange={handleInputChange}
           />
-           <input
-            type="file"
-            name="profile"
-            id="profile"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
         </div>
         <input
           type="submit"
           value={id ? 'Update Member' : 'Save Member'}
           className="button"
-          disabled={progress !== null && progress < 100}
         />
       </form>
     </AddWrapper>
