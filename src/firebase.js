@@ -1,17 +1,19 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/database"
 import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 const firebaseConfig = {
-  apiKey: "AIzaSyCoh08rvP16q8iTlbpMplSsDe6t0XVEYrk",
-  authDomain: "vaci-57d2c.firebaseapp.com",
-  projectId: "vaci-57d2c",
-  storageBucket: "vaci-57d2c.appspot.com",
-  messagingSenderId: "280457237480",
-  appId: "1:280457237480:web:0ec7eba80b0f5700b50a5d"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_APP_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE,
+  messagingSenderId: process.env.MESSAGE,
+  appId: process.env.FIREBASE_APP_ID
 };
 
 // Initialize Firebase
 const fireDb = firebase.initializeApp(firebaseConfig);
 export default fireDb.database().ref();
+export const auth = getAuth();
 export const storage = getStorage();
 

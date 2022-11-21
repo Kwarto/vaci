@@ -15,7 +15,7 @@ export const RegisterContainer = styled.div`
  border-radius: 10px;
  width: 60%;
  margin: 0 auto;
- min-height: 500px;
+ min-height: 470px;
 
  article{
     display: flex;

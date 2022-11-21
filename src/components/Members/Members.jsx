@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper';
@@ -8,9 +8,11 @@ import 'swiper/css/autoplay';
 import 'swiper/css/pagination';
 import banner from '../../img/banner1.jpg';
 import banner2 from '../../img/banner2.jpg';
-import { FaEdit, FaEye, FaLock, FaPhone, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaEye, FaLock, FaLockOpen, FaPhone, FaTrash } from 'react-icons/fa';
 import Footer from '../Footer/Footer';
 import fireDb from '../../firebase';
+import { auth } from '../../firebase';
+import { signOut } from 'firebase/auth';
 import { toast } from 'react-toastify';
 
 const photos = [
@@ -110,9 +112,11 @@ const group = [
   },
 ];
 
-const Members = () => {
+const Members = ({ user }) => {
   const [data, setData] = useState({});
-  // console.log(data);
+  const [search, setSearch] = useState('');
+  const userId = user?.uid;
+  const navigate = useNavigate();
   useEffect(() => {
     fireDb.child('members').on('value', (snapshot) => {
       if (snapshot.val() !== null) {
@@ -128,16 +132,29 @@ const Members = () => {
   }, []);
 
   const onDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this member?")) {
+    if (window.confirm('Are you sure you want to delete this member?')) {
       fireDb.child(`members/${id}`).remove((err) => {
         if (err) {
           toast.error(err);
         } else {
-          toast.success("Member Deleted Successfully");
+          toast.success('Member Deleted Successfully');
         }
-      })
+      });
     }
-  }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate(`/search?name=${search}`);
+    setSearch('');
+  };
+
+  const handleLogOut = () => {
+    signOut(auth).then(() => {
+      user(null);
+    });
+  };
+
   return (
     <>
       <NavWrapper>
@@ -145,15 +162,26 @@ const Members = () => {
           <h1>VACI</h1>
         </LogoWrapper>
         <AccWrapper>
-          <div>
-            <img src={banner} alt="" />
-          </div>
-          <div>
-            <button>
-              <FaLock className="lock" />
-              Logout
-            </button>
-          </div>
+          {userId ? (
+            <div>
+              <img src={banner} alt={user?.displayName} />
+              <p>{user?.displayName}</p>
+              <button onClick={handleLogOut}>
+                <FaLock className="lock" />
+                 Logout
+              </button>
+            </div>
+          ) : (
+            <div>
+              <Link to="/login">
+                  <button>
+                  <FaLockOpen className="lock" />
+                    Login
+                  </button>
+              </Link>
+            </div>
+          )}
+          <div></div>
         </AccWrapper>
       </NavWrapper>
       <HeaderSlider>
@@ -179,13 +207,16 @@ const Members = () => {
       </HeaderSlider>
       <MembersWrapper>
         <div className="search">
-          <input
-            type="text"
-            placeholder="Search a member"
-            onChange={(event) => {
-              // event.target.value
-            }}
-          />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Search a member"
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+              value={search}
+            />
+          </form>
         </div>
         <MembersContainer>
           <LeftContent>
@@ -200,13 +231,22 @@ const Members = () => {
                         </span>
                         <h5>{data[id].name}</h5>
                         <p>{data[id].gender}</p>
-                        <span className='work'>
+                        <span className="work">
                           <Link to={`/update/${id}`}>
-                           <p><FaEdit className='edit'/></p>
+                            <p>
+                              <FaEdit className="edit" />
+                            </p>
                           </Link>
-                          <p onClick={() => {onDelete(id)}}><FaTrash className='del'/></p>
+                          <p
+                            onClick={() => {
+                              onDelete(id);
+                            }}>
+                            <FaTrash className="del" />
+                          </p>
                           <Link to={`/view/${id}`}>
-                           <p><FaEye className='view'/></p>
+                            <p>
+                              <FaEye className="view" />
+                            </p>
                           </Link>
                         </span>
                       </div>
@@ -216,14 +256,12 @@ const Members = () => {
                           <FaPhone className="phone" />
                           {data[id].contact}
                         </a>
-                        <p>{ data[id].location }</p>
+                        <p>{data[id].location}</p>
                       </div>
                     </div>
                   </div>
                 );
-              })
-                
-              }
+              })}
             </article>
           </LeftContent>
           <RightContent>
@@ -287,11 +325,20 @@ const AccWrapper = styled.div`
   align-items: center;
   gap: 2rem;
 
+  p {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
   div {
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     img {
-      width: 40px;
-      height: 40px;
+      width: 20px;
+      height: 20px;
       border-radius: 50px;
       border: 2px solid #ffa600;
       cursor: pointer;
@@ -308,7 +355,7 @@ const AccWrapper = styled.div`
       cursor: pointer;
       font-size: 16px;
       font-weight: 700;
-
+      margin-left: 20px;
       .lock {
         font-size: 10px;
       }
@@ -454,21 +501,21 @@ const LeftContent = styled.div`
             width: 40%;
           }
 
-          .work{
+          .work {
             display: flex;
             align-items: center;
             gap: 15px;
             padding: 5px 0;
 
-            .edit{
+            .edit {
               color: green;
               font-size: 12px;
             }
-            .del{
+            .del {
               color: red;
               font-size: 12px;
             }
-            .view{
+            .view {
               color: blue;
               font-size: 12px;
             }
