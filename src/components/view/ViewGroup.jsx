@@ -89,6 +89,11 @@ const ViewGroupWrapper = styled.div`
     }
   }
  }
+
+ @media screen and (max-width: 768px){
+  width: 98%;
+  margin: 20% auto;
+ }
 `
 
 export default ViewGroup

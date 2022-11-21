@@ -491,7 +491,7 @@ const LeftContent = styled.div`
 
     @media screen and (max-width: 1024px) {
       grid-template-columns: 1fr;
-      gap: 1%;
+      gap: 5px;
       .member-wrapper {
         div {
           padding: 2px 0;
