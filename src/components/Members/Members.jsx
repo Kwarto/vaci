@@ -28,92 +28,9 @@ const photos = [
   },
 ];
 
-const group = [
-  {
-    id: 1,
-    group: 'Joshua',
-    gender: 'Male',
-    imgPath: '/assets/img/1.png',
-    name: 'Jane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 2,
-    group: 'Salem',
-    gender: 'Male',
-    imgPath: '/assets/img/3.png',
-    name: 'Bane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 3,
-    group: 'Precious',
-    gender: 'Female',
-    imgPath: '/assets/img/2.png',
-    name: 'Cane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 4,
-    group: 'Joshua',
-    gender: 'Male',
-    imgPath: '/assets/img/4.png',
-    name: 'Dane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 5,
-    group: 'Salem',
-    gender: 'Male',
-    imgPath: '/assets/img/5.png',
-    name: 'Eane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 6,
-    group: 'Precious',
-    gender: 'Female',
-    imgPath: '/assets/img/1.png',
-    name: 'Fane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 7,
-    group: 'Precious',
-    gender: 'Female',
-    imgPath: '/assets/img/2.png',
-    name: 'Fane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 8,
-    group: 'Precious',
-    gender: 'Female',
-    imgPath: '/assets/img/4.png',
-    name: 'Fane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-  {
-    id: 9,
-    group: 'Precious',
-    gender: 'Female',
-    imgPath: '/assets/img/5.png',
-    name: 'Fane Doe',
-    contact: '0204378020',
-    location: 'Kwadaso Estate',
-  },
-];
-
 const Members = ({ user }) => {
   const [data, setData] = useState({});
+  const [group, setGroup] = useState({});
   const [search, setSearch] = useState('');
   const userId = user?.uid;
   const navigate = useNavigate();
@@ -128,6 +45,20 @@ const Members = ({ user }) => {
 
     return () => {
       setData({});
+    };
+  }, []);
+
+  useEffect(() => {
+    fireDb.child('groups').on('value', (snapshot) => {
+      if (snapshot.val() !== null) {
+        setGroup({ ...snapshot.val() });
+      } else {
+        setGroup({});
+      }
+    });
+
+    return () => {
+      setGroup({});
     };
   }, []);
 
@@ -266,26 +197,34 @@ const Members = ({ user }) => {
           </LeftContent>
           <RightContent>
             <article>
-              {group.map((post) => {
+              {Object.keys(group).map((id, index) => {
                 return (
-                  <div key={post.id} className="memBox">
+                  <div key={id} className='memBox'>
                     <div className="member-wrapper">
-                      <div>
-                        <img src={post.imgPath} alt="" />
-                        <h5>{post.name}</h5>
-                        <p>{post.gender}</p>
-                      </div>
-                      <div>
-                        <h5>{post.group}</h5>
-                        <a href={`tel:/${post.contact}`}>
+                    <div>
+                      <span>
+                        <h5>{ index + 1}</h5>
+                      </span>
+                      <h3>{group[id].groupName}</h3>
+                      <p>{group[id].groupLeader}</p>
+                    </div>
+                    <div>
+                        <p><small>{group[id].groupDesc.substring(0, 60)}...</small></p>
+                        <a href={`tel:/${group[id].groupContact}`}>
                           <FaPhone className="phone" />
-                          {post.contact}
+                          {group[id].groupContact}
                         </a>
-                        <p>{post.location}</p>
-                      </div>
+                        <span>
+                        <Link to={`/group/${id}`}>
+                            <p>
+                              <FaEye className="view" />
+                            </p>
+                          </Link>
+                        </span>
+                    </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </article>
           </RightContent>
@@ -573,7 +512,7 @@ const LeftContent = styled.div`
 const RightContent = styled.div`
   background: rgba(15, 11, 221, 0.075);
   border-radius: 5px;
-  padding: 10px;
+  padding: 15px;
   height: 90%;
   overflow-y: scroll;
   @media screen and (max-width: 1024px) {

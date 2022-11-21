@@ -22,7 +22,6 @@ const View = () => {
     <ViewWrapper>
        <ViewContainer>
        <article>
-       
         <div className="card">
             <div className="card-header">
              <h3>{member.name}</h3>

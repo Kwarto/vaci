@@ -11,6 +11,8 @@ import View from './components/view/View';
 import Search from './components/Search/Search';
 import Upload from './components/Upload/Upload';
 import { auth } from './firebase';
+import AddGroup from './components/Group/AddGroup';
+import ViewGroup from './components/view/ViewGroup';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,9 +31,11 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />}  />
-          <Route path="add" element={<Add />} />
+          <Route path="/add" element={<Add />} />
+          <Route path="/add_group" element={<AddGroup />} />
           <Route path="/update/:id" element={<Add />} />
           <Route path="/view/:id" element={<View />} />
+          <Route path="/group/:id" element={<ViewGroup />} />
           <Route path="/members_and_families" element={user?.uid ? <Members user={user} /> : <Navigate to='/' />} />
           <Route path="/search" element={<Search />} />
           <Route path="/register" element={<Register />} />
