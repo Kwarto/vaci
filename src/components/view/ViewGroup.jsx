@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import fireDb from '../../firebase';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { FaPhone } from 'react-icons/fa';
 
 const ViewGroup = () => {
 const [group, setGroup] = useState({});
@@ -25,7 +26,7 @@ const [group, setGroup] = useState({});
             <div className="card-header">
              <h3>{group.groupName}</h3>
              <p>
-             <a href={`tel:/${group.groupContact}`}>{group.groupContact}</a>
+             <a href={`tel:/${group.groupContact}`}><FaPhone className='phone' />{group.groupContact}</a>
              </p>
              <h4>{group.groupLeader}</h4>
              <p>{group.groupDesc}</p>
@@ -36,6 +37,58 @@ const [group, setGroup] = useState({});
   )
 }
 
-const ViewGroupWrapper = styled.div``
+const ViewGroupWrapper = styled.div`
+ width: 60%;
+ margin: 10% auto;
+ padding: 10px;
+
+ article{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255, 255, 255);
+  box-shadow: 0 1rem .5rem rgba(8, 5, 145, 0.075);
+  border-radius: 10px;
+  padding: 10px;
+ 
+  .card{
+    .card-header{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-direction: column;
+      h3{
+        text-align: center;
+        font-size: 40px;
+        padding-bottom: 10px;
+        color: orange;
+      }
+
+      h4{
+        font-size: 20px;
+        padding-bottom: 20px;
+      }
+      p{
+        line-height: 1.6;
+        font-size: 18px;
+        max-width: 480px;
+        margin: 0 auto;
+        text-align: center;
+
+        a{
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: blue;
+          padding-bottom: 20px;
+          .phone{
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+ }
+`
 
 export default ViewGroup
