@@ -1,19 +1,21 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/database"
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 const firebaseConfig = {
-  apiKey: "AIzaSyCoh08rvP16q8iTlbpMplSsDe6t0XVEYrk",
-  authDomain: "vaci-57d2c.firebaseapp.com",
-  projectId: "vaci-57d2c",
-  storageBucket: "vaci-57d2c.appspot.com",
-  messagingSenderId: "280457237480",
-  appId: "1:280457237480:web:0ec7eba80b0f5700b50a5d"
+  apiKey: "AIzaSyBAhqi9LGSjOw3asGopzNbQBKy7dmeaD-0",
+  authDomain: "vaci-online.firebaseapp.com",
+  projectId: "vaci-online",
+  storageBucket: "vaci-online.appspot.com",
+  messagingSenderId: "888659694574",
+  appId: "1:888659694574:web:cf30ba2bd84f40e20bf4ff"
 };
 
 // Initialize Firebase
-const fireDb = firebase.initializeApp(firebaseConfig);
-export default fireDb.database().ref();
-export const auth = getAuth();
-export const storage = getStorage();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+export { auth, db, storage };
 

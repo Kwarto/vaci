@@ -1,99 +1,115 @@
-import React, { useEffect, useState } from 'react';
-import fireDb from '../../firebase';
-import { useParams } from 'react-router-dom';
+import React,  { useState, useEffect }  from 'react';
 import styled from 'styled-components';
-import { FaPhone } from 'react-icons/fa';
+import { collection, doc, getDoc, query, where } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useParams } from 'react-router-dom';
+import DetailMember from '../Members/DetailMember';
 
 const ViewGroup = () => {
-const [group, setGroup] = useState({});
   const { id } = useParams();
+  const [group, setGroup] = useState(null);
+  const [member, setMember] = useState([]);
+  const getSingMember = async () => {
+    const memRef = collection(db, 'members');
+    const memQuery = query(memRef, where('trending', '===', 'Yes'));
+    const querySnapshot = await getDoc(memQuery);
+    let member = [];
+    querySnapshot.forEach((doc) => {
+      member.push({ id: doc.id, ...doc.data() });
+    });
+    setMember(member);
+  };
+
   useEffect(() => {
-    fireDb
-      .child(`groups/${id}`)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setGroup({ ...snapshot.val() });
-        } else {
-          setGroup({});
-        }
-      });
+    getSingMember();
+    id && getGroupDetails();
+    // eslint-disable-next-line
   }, [id]);
+  const getGroupDetails = async () => {
+    const docRef = doc(db, 'groups', id);
+    const groupDetail = await getDoc(docRef);
+    setGroup(groupDetail.data());
+  };
   return (
-    <ViewGroupWrapper>
-        <article>
-          <div className="card">
-            <div className="card-header">
-             <h3>{group.groupName}</h3>
-             <p>
-             <a href={`tel:/${group.groupContact}`}><FaPhone className='phone' />{group.groupContact}</a>
-             </p>
-             <h4>{group.groupLeader}</h4>
-             <p>{group.groupDesc}</p>
-            </div>
+    <>
+      <ViewGroupWrapper style={{backgroundImage: `url('${group?.grpImg}')`}}>
+       <h1>{ group?.groupName}</h1>
+      </ViewGroupWrapper>
+      <GroupAbt>
+        <article className='left'>
+        <div className="top">
+          <img src={group?.grpImg} alt={group?.groupName} />
+          <h2>{ group?.groupLeader}</h2>
+        </div>
+        <div className="desc">
+          <h4>{`The Biblical Meaning of ${group?.groupName} Is ${group?.groupDesc}`}</h4>
+          <div>
+            <p>This group was created as an opportunity to share our different perspectives and insights and are broadened because of the interaction. More information is retained when there is active involvement, so biblical literacy is enhanced. Application and accountability bring understanding that moves God’s Word from the intellect to the heart. Transformation is encouraged (Romans 12:2), and our lives are changed. When our lives are changed, the lives of those around us are changed as well.</p>
+          </div>
         </div>
         </article>
-    </ViewGroupWrapper>
+        <article className='right'>
+          <DetailMember member={ member} />
+        </article>
+      </GroupAbt>
+    </>
   )
 }
 
 const ViewGroupWrapper = styled.div`
- width: 60%;
- margin: 10% auto;
- padding: 10px;
+ min-height: 60vh;
+ background-position: center;
+ background-size: cover;
+ display: flex;
+ align-items: center;
 
- article{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+ h1{
+  font-size: 50px;
   background: rgb(255, 255, 255);
-  box-shadow: 0 1rem .5rem rgba(8, 5, 145, 0.075);
-  border-radius: 10px;
-  padding: 10px;
- 
-  .card{
-    .card-header{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-direction: column;
-      h3{
-        text-align: center;
-        font-size: 40px;
-        padding-bottom: 10px;
-        color: orange;
-      }
+  box-shadow: 0 10px .5rem rgba(2, 7, 80, 0.082);
+  margin: 0 auto;
+  text-align: center;
+  transform: translateY(12rem);
+  width: 30rem;
+ }
+`
 
-      h4{
-        font-size: 20px;
-        padding-bottom: 20px;
-      }
+const GroupAbt = styled.div`
+display: grid;
+grid-template-columns: 70% 29%;
+gap: 1%;
+margin-left: 20px;
+  .top{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-top: 5%;
+    border-bottom: 1px solid grey;
+    padding-bottom: 8px;
+    width: 75%;
+    img{
+      width: 80px;
+      height: 80px;
+      border-radius: 50px;
+    }
+  }
+  .desc{
+    padding: 10px 0;
+    h4{
+      font-size: 30px;
+      padding-bottom: 10px;
+    }
+    div{
       p{
-        line-height: 1.6;
-        font-size: 18px;
-        max-width: 480px;
-        margin: 0 auto;
-        text-align: center;
-
-        a{
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: blue;
-          padding-bottom: 20px;
-          .phone{
-            font-size: 12px;
-          }
-        }
+        font-size: 20px;
+        max-width: 700px;
+        text-align: justify;
       }
     }
   }
- }
-
- @media screen and (max-width: 768px){
-  width: 98%;
-  margin: 20% auto;
- }
 `
+
+
+
 
 export default ViewGroup

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import { RegisterWrapper, RegisterContainer } from '../styles/SignElement';
 import registerImg from '../../img/register.gif';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,8 +11,8 @@ const initialState = {
   email: '',
   password: '',
 };
-
 const Register = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState(initialState);
 
   const { email, password, username } = state;
@@ -20,8 +20,6 @@ const Register = () => {
   const handleChange = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
   };
-
-  const navigate = useNavigate();
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -33,10 +31,11 @@ const Register = () => {
       );
       await updateProfile(user, { displayName: `${username}` });
     } else {
-       return toast.error("Please all fields are required!");
+      return toast.error('All fields are required!');
     }
     navigate('/');
   };
+
   return (
     <>
       <RegisterWrapper>
@@ -81,4 +80,5 @@ const Register = () => {
     </>
   );
 };
+
 export default Register;

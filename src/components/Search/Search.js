@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaPhone } from 'react-icons/fa';
-import fireDb from '../../firebase';
+// import { FaPhone } from 'react-icons/fa';
 
 const Search = () => {
-    const [data, setData] = useState({});
+    // const [data, setData] = useState({});
 
-    const useQuery = () => {
-        return new URLSearchParams(useLocation().search);
-    }
+    // const useQuery = () => {
+    //     return new URLSearchParams(useLocation().search);
+    // }
 
-    let query = useQuery();
-    let search = query.get("name");
-    console.log("search", search);
+    // let query = useQuery();
+    // let search = query.get("name");
+    // console.log("search", search);
 
-    useEffect(() => {
-      searchData();
-       // eslint-disable-next-line
-    }, [search])
+    // useEffect(() => {
+    //   searchData();
+    //    // eslint-disable-next-line
+    // }, [search])
 
-    const searchData = () => {
-        fireDb.child("members").orderByChild("name").equalTo(search).on("value", (snapshot) => {
-        if (snapshot.val()) {
-            const data = snapshot.val();
-            setData(data);
-        }
-    })
-    }
+    // const searchData = () => {
+    //     fireDb.child("members").orderByChild("name").equalTo(search).on("value", (snapshot) => {
+    //     if (snapshot.val()) {
+    //         const data = snapshot.val();
+    //         setData(data);
+    //     }
+    // })
+    // }
   return (
     <SearchContent>
-        {
+        {/* {
         Object.keys(data).length === 0 ? (
           <div className='err-msg'>
             <h2>No Search Found With That Name: {query.get("name")}</h2>
@@ -80,8 +79,8 @@ const Search = () => {
           }
         </article>
           )
-        }
-          </SearchContent>
+        } */}
+    </SearchContent>
   )
 }
 

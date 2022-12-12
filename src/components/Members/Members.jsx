@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper';
@@ -8,12 +8,16 @@ import 'swiper/css/autoplay';
 import 'swiper/css/pagination';
 import banner from '../../img/banner1.jpg';
 import banner2 from '../../img/banner2.jpg';
-import { FaEdit, FaEye, FaLock, FaLockOpen, FaPhone, FaTrash } from 'react-icons/fa';
+import logoImg from '../../img/vaci-logo.jpg';
+import SingleMember from '../SingleMember/SingleMember';
+import { FaArrowDown, FaArrowUp, FaLock, FaLockOpen } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import Footer from '../Footer/Footer';
-import fireDb from '../../firebase';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
-import { toast } from 'react-toastify';
+import { db } from '../../firebase';
+import { collection, deleteDoc, doc, onSnapshot, where, query, getDocs } from 'firebase/firestore';
+import Family from '../Family/Family';
 
 const photos = [
   {
@@ -29,90 +33,104 @@ const photos = [
 ];
 
 const Members = ({ user }) => {
-  const [data, setData] = useState({});
-  const [group, setGroup] = useState({});
   const [search, setSearch] = useState('');
-  const userId = user?.uid;
-  const navigate = useNavigate();
-  useEffect(() => {
-    fireDb.child('members').on('value', (snapshot) => {
-      if (snapshot.val() !== null) {
-        setData({ ...snapshot.val() });
-      } else {
-        setData({});
-      }
-    });
-
-    return () => {
-      setData({});
-    };
-  }, []);
-
-  useEffect(() => {
-    fireDb.child('groups').on('value', (snapshot) => {
-      if (snapshot.val() !== null) {
-        setGroup({ ...snapshot.val() });
-      } else {
-        setGroup({});
-      }
-    });
-
-    return () => {
-      setGroup({});
-    };
-  }, []);
-
-  const onDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
-      fireDb.child(`members/${id}`).remove((err) => {
-        if (err) {
-          toast.error(err);
-        } else {
-          toast.success('Member Deleted Successfully');
-        }
-      });
+  const [members, setMembers] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [family, setFamily] = useState(false);
+  console.log(search);
+  const handleSubmit = async (e) => {
+    const q = query(collection(db, "members"), where("search", "==", "members?.name"));
+    try {
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        setSearch(doc.data())
+      })
+    } catch (error) {
+      console.log(error)
     }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate(`/search?name=${search}`);
-    setSearch('');
-  };
-
   const handleLogOut = () => {
-    signOut(auth).then(() => {
-      user(null);
-    });
+    signOut(auth).then(() => {});
   };
 
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'members'),
+      (snapshot) => {
+        let list = [];
+        snapshot.docs.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setMembers(list);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    return () => {
+      unsub();
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'groups'),
+      (snapshot) => {
+        let list = [];
+        snapshot.docs.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setGroups(list);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    return () => {
+      unsub();
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this member ?')) {
+      try {
+        await deleteDoc(doc(db, 'members', id));
+        toast.success('Member deleted successfully');
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
   return (
     <>
       <NavWrapper>
         <LogoWrapper>
-          <h1>VACI</h1>
+          <img src={logoImg} alt="logo" />
         </LogoWrapper>
         <AccWrapper>
-          {userId ? (
+          {user?.uid ? (
             <div>
-              <img src={banner} alt={user?.displayName} />
+              <img src={banner} alt="user" />
               <p>{user?.displayName}</p>
               <button onClick={handleLogOut}>
                 <FaLock className="lock" />
-                 Logout
+                Logout
               </button>
             </div>
           ) : (
             <div>
               <Link to="/login">
-                  <button>
+                <button>
                   <FaLockOpen className="lock" />
-                    Login
-                  </button>
+                  Login
+                </button>
               </Link>
             </div>
           )}
-          <div></div>
         </AccWrapper>
       </NavWrapper>
       <HeaderSlider>
@@ -151,84 +169,31 @@ const Members = ({ user }) => {
         </div>
         <MembersContainer>
           <LeftContent>
-            <article>
-              {Object.keys(data).map((id, index) => {
-                return (
-                  <div key={id} className="memBox">
-                    <div className="member-wrapper">
-                      <div>
-                        <span>
-                          <h5>{index + 1}</h5>
-                        </span>
-                        <h5>{data[id].name}</h5>
-                        <p>{data[id].gender}</p>
-                        <span className="work">
-                          <Link to={`/update/${id}`}>
-                            <p>
-                              <FaEdit className="edit" />
-                            </p>
-                          </Link>
-                          <p
-                            onClick={() => {
-                              onDelete(id);
-                            }}>
-                            <FaTrash className="del" />
-                          </p>
-                          <Link to={`/view/${id}`}>
-                            <p>
-                              <FaEye className="view" />
-                            </p>
-                          </Link>
-                        </span>
-                      </div>
-                      <div>
-                        <h5>{data[id].group}</h5>
-                        <a href={`tel:/${data[id].contact}`}>
-                          <FaPhone className="phone" />
-                          {data[id].contact}
-                        </a>
-                        <p>{data[id].location}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </article>
+            <SingleMember members={members} handleDelete={handleDelete} />
           </LeftContent>
-          <RightContent>
-            <article>
-              {Object.keys(group).map((id, index) => {
-                return (
-                  <div key={id} className='memBox'>
-                    <div className="member-wrapper">
-                    <div>
-                      <span>
-                        <h5>{ index + 1}</h5>
-                      </span>
-                      <h3>{group[id].groupName}</h3>
-                      <p>{group[id].groupLeader}</p>
-                    </div>
-                    <div>
-                        <p><small>{group[id].groupDesc.substring(0, 60)}...</small></p>
-                        <a href={`tel:/${group[id].groupContact}`}>
-                          <FaPhone className="phone" />
-                          {group[id].groupContact}
-                        </a>
-                        <span>
-                        <Link to={`/group/${id}`}>
-                            <p>
-                              <FaEye className="view" />
-                            </p>
-                          </Link>
-                        </span>
-                    </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </article>
-          </RightContent>
         </MembersContainer>
+        <GroupWrapper>
+          <article>
+            <div className="main">
+              <img src={banner2} alt="" onClick={() => setFamily(true)} />
+              <div className="action">
+                <h1 onClick={() => setFamily(true)} className="a-c">
+                  Family <FaArrowDown className="f-a" />
+                </h1>
+                <p onClick={() => setFamily()} className="a-c">
+                  Show Less <FaArrowUp className="f-a" />
+                </p>
+              </div>
+            </div>
+            <div>
+            </div>
+          </article>
+          {family && (
+            <article className="fam">
+              <Family groups={groups} />
+            </article>
+          )}
+        </GroupWrapper>
       </MembersWrapper>
       <Footer />
     </>
@@ -252,10 +217,9 @@ const NavWrapper = styled.nav`
 
 const LogoWrapper = styled.div`
   cursor: pointer;
-  h1 {
-    color: #ffa600;
-    font-size: 30px;
-    font-weight: 700;
+  padding: 5px 0;
+  img {
+    width: 80%;
   }
 `;
 
@@ -276,10 +240,9 @@ const AccWrapper = styled.div`
     justify-content: center;
     gap: 10px;
     img {
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       border-radius: 50px;
-      border: 2px solid #ffa600;
       cursor: pointer;
     }
     button {
@@ -365,6 +328,7 @@ const HeaderSlider = styled.div`
 `;
 
 const MembersWrapper = styled.section`
+  overflow-x: hidden;
   .search {
     border-radius: 5px;
     box-shadow: 0 10px 10px rgba(242, 242, 250, 0.068);
@@ -384,211 +348,69 @@ const MembersWrapper = styled.section`
       width: 70%;
     }
     @media screen and (max-width: 768px) {
-      width: 80%;
+      width: 90%;
     }
   }
 `;
 
 const MembersContainer = styled.div`
+  padding: 30px 0;
   display: grid;
-  grid-template-columns: 69% 30%;
+  grid-template-columns: repeat(4, 1fr);
   gap: 1%;
-  width: 98%;
-  margin: 0 auto;
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: 49% 50%;
+  width: 100%;
+  /* margin: 0 auto; */
+  background: rgba(18, 4, 214, 0.041);
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  @media screen and (max-width: 768px) {
-    grid-template-columns: 100%;
+  @media screen and (max-width: 425px) {
+    grid-template-columns: 1fr;
   }
 `;
 
 const LeftContent = styled.div`
-  background: rgba(18, 4, 214, 0.041);
   border-radius: 5px;
   padding: 10px;
-  height: 90%;
-  overflow-y: scroll;
-  @media screen and (max-width: 1024px) {
-    height: 50%;
-    overflow-y: scroll;
-  }
-  @media screen and (max-width: 798px) {
-    height: 100%;
-    overflow-y: scroll;
-  }
-  article {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1%;
-    .memBox {
-      margin-bottom: 10px;
-      border-radius: 10px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(16, 3, 94, 0.103);
-      cursor: pointer;
-      .member-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        div {
-          width: 100%;
-          padding: 2px 8px;
-          img {
-            width: 40%;
-          }
-
-          .work {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 5px 0;
-
-            .edit {
-              color: green;
-              font-size: 12px;
-            }
-            .del {
-              color: red;
-              font-size: 12px;
-            }
-            .view {
-              color: blue;
-              font-size: 12px;
-            }
-          }
-
-          h5,
-          h6 {
-            font-size: 17px;
-            font-weight: 700;
-          }
-
-          p {
-            line-height: 1.6;
-            font-size: 18px;
-            font-weight: 500;
-          }
-
-          a {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: rgba(13, 0, 128, 0.781);
-            font-size: 18px;
-            font-weight: 500;
-            padding: 2px 0;
-
-            .phone {
-              font-size: 10px;
-            }
-          }
-        }
-      }
-    }
-
-    @media screen and (max-width: 1024px) {
-      grid-template-columns: 1fr;
-      gap: 5px;
-      .member-wrapper {
-        div {
-          padding: 2px 0;
-        }
-      }
-    }
-    @media screen and (max-width: 768px) {
-      grid-template-columns: 1fr;
-      .member-wrapper {
-        div {
-          padding: 2px 0;
-        }
-      }
-    }
-  }
 `;
 
-const RightContent = styled.div`
-  background: rgba(15, 11, 221, 0.075);
-  border-radius: 5px;
-  padding: 15px;
-  height: 90%;
-  overflow-y: scroll;
-  @media screen and (max-width: 1024px) {
-    height: 50%;
-    overflow-y: scroll;
+const GroupWrapper = styled.section`
+  padding: 40px 10px;
+  width: 98%;
+  margin: 0 auto;
+  div {
+    width: 100%;
+    img {
+      width: 100%;
+    }
   }
-  @media screen and (max-width: 798px) {
-    height: 100%;
-    overflow-y: scroll;
-  }
-  article {
-    display: grid;
-    grid-template-columns: 1fr;
-    .memBox {
-      margin-bottom: 10px;
-      border-radius: 10px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(16, 3, 94, 0.103);
+
+  .action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 5px;
+
+    .a-c {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .f-a {
+      font-size: 13px;
+    }
+
+    h1 {
+      font-size: 25px;
       cursor: pointer;
-      .member-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        div {
-          width: 100%;
-          padding: 2px 8px;
-          img {
-            width: 40%;
-          }
-
-          h5,
-          h6 {
-            font-size: 17px;
-            font-weight: 700;
-          }
-
-          p {
-            line-height: 1.6;
-            font-size: 18px;
-            font-weight: 500;
-          }
-
-          a {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: rgba(13, 0, 128, 0.781);
-            font-size: 18px;
-            font-weight: 500;
-            padding: 2px 0;
-
-            .phone {
-              font-size: 10px;
-            }
-          }
-        }
-      }
     }
 
-    @media screen and (max-width: 1024px) {
-      grid-template-columns: 1fr;
-      gap: 1%;
-      .member-wrapper {
-        div {
-          padding: 2px 0;
-        }
-      }
-    }
-    @media screen and (max-width: 768px) {
-      grid-template-columns: 1fr;
-      .member-wrapper {
-        div {
-          padding: 2px 0;
-        }
-      }
+    p {
+      font-weight: bold;
+      text-decoration: underline;
+      cursor: pointer;
     }
   }
 `;

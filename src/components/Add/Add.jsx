@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import fireDb from '../../firebase';
+import { db, storage } from '../../firebase';
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 const initialState = {
   name: '',
   gender: '',
@@ -29,7 +35,8 @@ const initialState = {
 
 const Add = () => {
   const [state, setState] = useState(initialState);
-  const [data, setData] = useState({});
+  const [file, setFile] = useState(null);
+  const [progress, setProgress] = useState(false);
   const navigate = useNavigate();
   const {
     name,
@@ -55,86 +62,86 @@ const Add = () => {
     lifeMother,
   } = state;
 
-  const { id } = useParams();
-
-  useEffect(() => {
-    fireDb.child('members').on('value', (snapshot) => {
-      if (snapshot.val() !== null) {
-        setData({ ...snapshot.val() });
-      } else {
-        setData({});
-      }
-    });
-
-    return () => {
-      setData({});
-    };
-  }, [id]);
-
-  useEffect(() => {
-    if (id) {
-      setState({ ...data[id] });
-    } else {
-      setState({ ...initialState });
-    }
-
-    return () => {
-      setState({ ...initialState });
-    };
-  }, [id, data]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
-      !name ||
-      !gender ||
-      !marital ||
-      !contact ||
-      !dateOfBirth ||
-      !numberOfChildren ||
-      !occupation ||
-      !spouseName ||
-      !spouseContact ||
-      !group ||
-      !education ||
-      !baptism ||
-      !location ||
-      !digitalAdd ||
-      !father ||
-      !mother ||
-      !nextPerson ||
-      !nextPersonContact ||
-      !nameOfLeader ||
-      !lifeFather ||
-      !lifeMother
+      name &&
+      gender &&
+      marital &&
+      dateOfBirth &&
+      contact &&
+      occupation &&
+      numberOfChildren &&
+      spouseName &&
+      spouseContact &&
+      group &&
+      education &&
+      baptism &&
+      location &&
+      digitalAdd &&
+      father &&
+      mother &&
+      nextPerson &&
+      nextPersonContact &&
+      nameOfLeader &&
+      lifeFather &&
+      lifeMother
     ) {
-      toast.error('Please provide value to each input field');
-    } else {
-      if (!id) {
-        fireDb.child('members').push(state, (err) => {
-          if (err) {
-            toast.error(err);
-          } else {
-            toast.success('Member Added Successfully!');
-          }
+      try {
+        await addDoc(collection(db, 'members'), {
+          ...state,
+          timestamp: serverTimestamp(),
         });
-      } else {
-        fireDb.child(`members/${id}`).set(state, (err) => {
-          if (err) {
-            toast.error(err);
-          } else {
-            toast.success('Member Updated Successfully!');
-          }
-        });
+        toast.success('Member created successfully');
+      } catch (error) {
+        console.log(error);
       }
-      setTimeout(() => navigate('/members_and_families'), 500);
+    } else {
+      toast.error("Something went wrong");
     }
+    navigate('/members_and_families');
   };
 
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setState({ ...state, [name]: value });
+    setState({ ...state, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    const uploadFile = () => {
+      const storageRef = ref(storage, file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(progress);
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload paused');
+              break;
+            case 'running':
+              console.log('Upload is running');
+              break;
+            default:
+              break;
+          }
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+            toast.info('Upload completed can now submit member');
+            setState((prev) => ({ ...prev, imgUrl: downloadUrl }));
+          });
+        }
+      );
+    };
+
+    file && uploadFile();
+  }, [file]);
 
   return (
     <AddWrapper>
@@ -309,10 +316,12 @@ const Add = () => {
             value={lifeMother || ''}
             onChange={handleInputChange}
           />
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         </div>
         <input
           type="submit"
-          value={id ? 'Update Member' : 'Save Member'}
+          value='Submit'
+          disabled={progress !== null && progress > 100}
           className="button"
         />
       </form>

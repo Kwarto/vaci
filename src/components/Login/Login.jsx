@@ -52,7 +52,8 @@ const Login = () => {
             </form>
            </article>
         </RegisterContainer>
-     </RegisterWrapper>
+        </RegisterWrapper>
+     
     </>
   );
 };

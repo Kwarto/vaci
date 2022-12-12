@@ -31,12 +31,12 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />}  />
-          <Route path="/add" element={<Add />} />
+          <Route path="/add" element={<Add /> } />
           <Route path="/add_group" element={<AddGroup />} />
-          <Route path="/update/:id" element={<Add />} />
-          <Route path="/view/:id" element={<View />} />
-          <Route path="/group/:id" element={<ViewGroup />} />
-          <Route path="/members_and_families" element={user?.uid ? <Members user={user} /> : <Navigate to='/' />} />
+          <Route path="/update/:id" element={ <Add /> } />
+          <Route path="/view/:id" element={ <View /> } />
+          <Route path="/group/:id" element={<ViewGroup /> } />
+          <Route path="/members_and_families" element={user?.uid ? <Members user={user} /> : <Navigate to='/login' />} />
           <Route path="/search" element={<Search />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
