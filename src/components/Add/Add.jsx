@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate, useParams} from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { db, storage } from '../../firebase';
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   serverTimestamp,
+  updateDoc,
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 const initialState = {
@@ -38,6 +41,7 @@ const Add = () => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams();
   const {
     name,
     gender,
@@ -64,37 +68,27 @@ const Add = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      name &&
-      gender &&
-      marital &&
-      dateOfBirth &&
-      contact &&
-      occupation &&
-      numberOfChildren &&
-      spouseName &&
-      spouseContact &&
-      group &&
-      education &&
-      baptism &&
-      location &&
-      digitalAdd &&
-      father &&
-      mother &&
-      nextPerson &&
-      nextPersonContact &&
-      nameOfLeader &&
-      lifeFather &&
-      lifeMother
-    ) {
-      try {
-        await addDoc(collection(db, 'members'), {
-          ...state,
-          timestamp: serverTimestamp(),
-        });
-        toast.success('Member created successfully');
-      } catch (error) {
-        console.log(error);
+    if (name &&gender &&marital &&dateOfBirth &&contact &&occupation &&numberOfChildren &&spouseName &&spouseContact &&group &&education &&baptism &&location &&digitalAdd &&father &&mother &&nextPerson &&nextPersonContact &&nameOfLeader &&lifeFather &&lifeMother){
+      if (!id) {
+        try {
+          await addDoc(collection(db, 'members'), {
+            ...state,
+            timestamp: serverTimestamp(),
+          });
+          toast.success('Member created successfully');
+        } catch (error) {
+          console.log(error);
+        }   
+      } else {
+        try {
+          await updateDoc(doc(db, 'members', id), {
+            ...state,
+            timestamp: serverTimestamp(),
+          });
+          toast.success('Member updated successfully');
+        } catch (error) {
+          console.log(error);
+        } 
       }
     } else {
       toast.error("Something went wrong");
@@ -142,6 +136,19 @@ const Add = () => {
 
     file && uploadFile();
   }, [file]);
+
+  useEffect(() => {
+    id && getMemberDetails();
+    // eslint-disable-next-line 
+  }, [id]);
+
+  const getMemberDetails = async () => {
+    const memRef = doc(db, 'members', id);
+    const snapshot = await getDoc(memRef);
+    if (snapshot.exists()) {
+      setState({...snapshot.data()});
+    }
+  }
 
   return (
     <AddWrapper>
@@ -320,7 +327,7 @@ const Add = () => {
         </div>
         <input
           type="submit"
-          value='Submit'
+          value={id ? "Update Member" : "Add Member"}
           disabled={progress !== null && progress > 100}
           className="button"
         />

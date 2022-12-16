@@ -38,7 +38,7 @@ function App() {
           <Route path="/group/:id" element={<ViewGroup /> } />
           <Route path="/members_and_families" element={user?.uid ? <Members user={user} /> : <Navigate to='/login' />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/sign_admin" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/upload" element={<Upload />} />
         </Routes>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaPen, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper';
@@ -41,9 +41,12 @@ const SingleMember = ({ members, handleDelete }) => {
                   </Link>
                   <h3>{item.group}</h3>
                   <FaTrash
-                    className="drop"
+                    className="act"
                     onClick={() => handleDelete(item.id)}
                   />
+                  <Link to={`/update/${item.id}`}>
+                   <FaPen className="view" />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -89,9 +92,14 @@ const SingleWrapper = styled.div`
               color: rgb(2, 22, 77);
             }
 
-            .drop {
+            .act {
               color: red;
               cursor: pointer;
+            }
+            .view {
+              color: green;
+              cursor: pointer;
+              margin-left: 12px;
             }
           }
         }

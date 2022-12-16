@@ -46,9 +46,6 @@ const Login = () => {
                 <Link to='/'><p style={{float: "right", margin:"0px 20px"}}>Forget Password?</p></Link>
              </div>
              <button>Login</button>
-             <div>
-                <Link to='/register'><p>Don't have account ?</p></Link>
-             </div>
             </form>
            </article>
         </RegisterContainer>

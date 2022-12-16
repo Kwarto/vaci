@@ -155,6 +155,18 @@ const Members = ({ user }) => {
         </Swiper>
       </HeaderSlider>
       <MembersWrapper>
+        <div className="func-sec">
+        <div className='add'>
+            <Link to='/add'>
+              <p>Add Member</p>
+            </Link>
+            <Link to='/add_group'>
+              <p>Add Family</p>
+            </Link>
+            <Link to='/sign_admin'>
+              <p>Add User</p>
+            </Link>
+        </div>
         <div className="search">
           <form onSubmit={handleSubmit}>
             <input
@@ -166,6 +178,7 @@ const Members = ({ user }) => {
               value={search}
             />
           </form>
+        </div>
         </div>
         <MembersContainer>
           <LeftContent>
@@ -329,7 +342,13 @@ const HeaderSlider = styled.div`
 
 const MembersWrapper = styled.section`
   overflow-x: hidden;
-  .search {
+  .func-sec{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    .search {
     border-radius: 5px;
     box-shadow: 0 10px 10px rgba(242, 242, 250, 0.068);
     min-height: 5vh;
@@ -350,7 +369,37 @@ const MembersWrapper = styled.section`
     @media screen and (max-width: 768px) {
       width: 90%;
     }
+   }
+   .add{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    p{
+      font-size: 16px;
+      font-weight: 600;
+      background: rgb(235, 147, 15);
+      color: #fff;
+      padding: 8px 15px;
+    }
+   }
   }
+ @media screen and (max-width: 430px){
+  .func-sec{
+    width: 98%;
+    display: block;
+    margin: 0 10px;
+
+    .search{
+      width: 96%;
+      transform: translateX(-1px);
+      input{
+        width: 100%;
+      }
+    }
+  }
+ }
 `;
 
 const MembersContainer = styled.div`

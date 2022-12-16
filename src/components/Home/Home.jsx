@@ -62,8 +62,7 @@ const Home = () => {
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia
               tempora repellat earum impedit culpa nihil repudiandae. Nisi
-              corrupti quaerat provident mollitia similique alias perspiciatis
-              repellendus quasi blanditiis, non quas illo.
+              corrupti quaerat provident mollitia similique alias.
             </p>
           </article>
           <article>
@@ -73,8 +72,7 @@ const Home = () => {
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia
               tempora repellat earum impedit culpa nihil repudiandae. Nisi
-              corrupti quaerat provident mollitia similique alias perspiciatis
-              repellendus quasi blanditiis, non quas illo.
+              corrupti quaerat provident mollitia similique alias.
             </p>
             </Link>
           </article>
@@ -87,8 +85,7 @@ const Home = () => {
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia
               tempora repellat earum impedit culpa nihil repudiandae. Nisi
-              corrupti quaerat provident mollitia similique alias perspiciatis
-              repellendus quasi blanditiis, non quas illo.
+              corrupti quaerat provident mollitia similique alias.
             </p>
           </article>
         </OurContainer>
@@ -131,7 +128,7 @@ const HomeWrapper = styled.div`
       padding-bottom: 8px;
     }
     p {
-      max-width: 500px;
+      max-width: 700px;
       text-align: center;
       margin: 0 auto;
       font-size: 20px;
@@ -251,6 +248,10 @@ const LocationWrapper = styled.div`
 const OurWrapper = styled.div`
   padding: 60px 0;
   background: rgba(0, 0, 255, 0.062);
+
+  h2{
+    text-align: center;
+  }
 `;
 
 const OurContainer = styled.div`
@@ -280,11 +281,12 @@ const OurContainer = styled.div`
     }
 
     p {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 500;
       text-align: center;
       line-height: 1.6;
       color: rgb(1, 8, 24);
+      max-width: 500px;
     }
 
     &:hover {
