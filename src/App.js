@@ -9,7 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import Add from './components/Add/Add';
 import View from './components/view/View';
 import Search from './components/Search/Search';
-import Upload from './components/Upload/Upload';
 import { auth } from './firebase';
 import AddGroup from './components/Group/AddGroup';
 import ViewGroup from './components/view/ViewGroup';
@@ -40,7 +39,6 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/sign_admin" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/upload" element={<Upload />} />
         </Routes>
       </Router>
     </>
