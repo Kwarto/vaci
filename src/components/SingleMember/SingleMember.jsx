@@ -76,7 +76,7 @@ const SingleWrapper = styled.div`
       }
       .abt {
         h3 {
-          font-size: 18px;
+          font-size: 16px;
           color: rgb(28, 2, 100);
           padding-top: 20px;
           padding-bottom: 8px;
@@ -84,7 +84,7 @@ const SingleWrapper = styled.div`
 
         h2 {
           color: rgb(2, 22, 77);
-          font-size: 20px;
+          font-size: 15px;
         }
 
         .act {
