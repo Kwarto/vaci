@@ -54,11 +54,11 @@ const View = () => {
                   <p>{member?.dateOfBirth}</p>
                   <span>
                     <p>{member?.father}</p>
-                    <p>{member?.lifeFather}</p>
+                    <p className='lyf'>{member?.lifeFather}</p>
                   </span>
                   <span>
                     <p>{member?.mother}</p>
-                    <p>{member?.lifeMother}</p>
+                    <p className='lyf'>{member?.lifeMother}</p>
                   </span>
                   <p>{member?.marital}</p>
                   <p>{member?.occupation}</p>
@@ -128,7 +128,7 @@ const ViewContainer = styled.div`
 
     @media screen and (max-width: 768px){
       h1{
-        font-size: 20px;
+        font-size: 13px;
         span{
         text-align: center;
         margin: 0 45px;
@@ -165,8 +165,12 @@ const ViewContainer = styled.div`
       }
     }
     .mem-info {
+      h2{
+        font-weight: 600;
+      }
       h3 {
         padding: 3px 0;
+        font-weight: 600;
       }
     }
 
@@ -192,6 +196,17 @@ const ViewContainer = styled.div`
         align-items: center;
         gap: 20px;
       }
+      .lyf{
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 6rem;
+        height: 28px;
+        border-radius: 40px;
+        font-size: 16px;
+        font-weight: 600;
+      }
     }
     table {
       width: 100%;
@@ -200,7 +215,7 @@ const ViewContainer = styled.div`
     .right {
       position: absolute;
       top: 0;
-      transform: translateX(-14rem);
+      transform: translateX(-17rem);
     }
 
     @media screen and (max-width: 768px){
@@ -211,7 +226,7 @@ const ViewContainer = styled.div`
 
       .right{
         top: 20rem;
-        margin-left: 20px;
+        margin-left: -2rem;
       }
     }
   }
@@ -233,6 +248,7 @@ const ViewContainer = styled.div`
     h2
     {
       text-align: center;
+      font-size: 20px;
     }
 
     @media screen and (max-width: 768px){

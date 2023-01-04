@@ -16,7 +16,12 @@ import Footer from '../Footer/Footer';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db } from '../../firebase';
-import { collection, deleteDoc, doc, onSnapshot, where, query, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+} from 'firebase/firestore';
 import Family from '../Family/Family';
 
 const photos = [
@@ -33,22 +38,10 @@ const photos = [
 ];
 
 const Members = ({ user }) => {
-  const [search, setSearch] = useState('');
   const [members, setMembers] = useState([]);
   const [groups, setGroups] = useState([]);
   const [family, setFamily] = useState(false);
-  console.log(search);
-  const handleSubmit = async (e) => {
-    const q = query(collection(db, "members"), where("search", "==", "members?.name"));
-    try {
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        setSearch(doc.data())
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  };
+
   const handleLogOut = () => {
     signOut(auth).then(() => {});
   };
@@ -156,29 +149,26 @@ const Members = ({ user }) => {
       </HeaderSlider>
       <MembersWrapper>
         <div className="func-sec">
-        <div className='add'>
-            <Link to='/add'>
+          <div className="add">
+            <Link to="/add">
               <p>Add Member</p>
             </Link>
-            <Link to='/add_group'>
+            <Link to="/add_group">
               <p>Add Family</p>
             </Link>
-            <Link to='/sign_admin'>
+            <Link to="/sign_admin">
               <p>Add User</p>
             </Link>
-        </div>
-        <div className="search">
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Search a member"
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              value={search}
-            />
-          </form>
-        </div>
+          </div>
+          <div className="search">
+            <form>
+              <input
+                type="text"
+                placeholder="Search a member"
+                onChange={(e) => (e.target.value)}
+              />
+            </form>
+          </div>
         </div>
         <MembersContainer>
           <LeftContent>
@@ -198,8 +188,7 @@ const Members = ({ user }) => {
                 </p>
               </div>
             </div>
-            <div>
-            </div>
+            <div></div>
           </article>
           {family && (
             <article className="fam">
@@ -342,64 +331,64 @@ const HeaderSlider = styled.div`
 
 const MembersWrapper = styled.section`
   overflow-x: hidden;
-  .func-sec{
+  .func-sec {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 80%;
     margin: 0 auto;
     .search {
-    border-radius: 5px;
-    box-shadow: 0 10px 10px rgba(242, 242, 250, 0.068);
-    min-height: 5vh;
-    width: 40%;
-    margin: 10px auto;
-
-    input {
       border-radius: 5px;
-      width: 100%;
-      padding: 15px 10px;
-      font-size: 18px;
-      background: rgba(4, 4, 95, 0.068);
-    }
+      box-shadow: 0 10px 10px rgba(242, 242, 250, 0.068);
+      min-height: 5vh;
+      width: 40%;
+      margin: 10px auto;
 
-    @media screen and (max-width: 1024px) {
-      width: 70%;
-    }
-    @media screen and (max-width: 768px) {
-      width: 90%;
-    }
-   }
-   .add{
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-right: 10px;
-    cursor: pointer;
-    p{
-      font-size: 16px;
-      font-weight: 600;
-      background: rgb(235, 147, 15);
-      color: #fff;
-      padding: 8px 15px;
-    }
-   }
-  }
- @media screen and (max-width: 430px){
-  .func-sec{
-    width: 98%;
-    display: block;
-    margin: 0 10px;
-
-    .search{
-      width: 96%;
-      transform: translateX(-1px);
-      input{
+      input {
+        border-radius: 5px;
         width: 100%;
+        padding: 15px 10px;
+        font-size: 18px;
+        background: rgba(4, 4, 95, 0.068);
+      }
+
+      @media screen and (max-width: 1024px) {
+        width: 70%;
+      }
+      @media screen and (max-width: 768px) {
+        width: 90%;
+      }
+    }
+    .add {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      p {
+        font-size: 16px;
+        font-weight: 600;
+        background: rgb(235, 147, 15);
+        color: #fff;
+        padding: 8px 15px;
       }
     }
   }
- }
+  @media screen and (max-width: 430px) {
+    .func-sec {
+      width: 98%;
+      display: block;
+      margin: 0 10px;
+
+      .search {
+        width: 96%;
+        transform: translateX(-1px);
+        input {
+          width: 100%;
+        }
+      }
+    }
+  }
 `;
 
 const MembersContainer = styled.div`
