@@ -215,7 +215,7 @@ const ViewContainer = styled.div`
     .right {
       position: absolute;
       top: 0;
-      transform: translateX(-17rem);
+      transform: translateX(-14rem);
     }
 
     @media screen and (max-width: 768px){
